@@ -1,4 +1,4 @@
-const queryString = (object) => {
+export const queryString = (object) => {
   const entries = Object.entries(object).map(([key, value]) => {
     if (typeof value === 'object' && !Array.isArray(value)) {
       throw new Error('please, checkout your params');
@@ -9,7 +9,7 @@ const queryString = (object) => {
   return entries.join('&');
 };
 
-const parse = (string) =>
+export const parse = (string) =>
   Object.fromEntries(
     string.split('&').map((item) => {
       const [key, valueString] = item.split('=');
@@ -21,4 +21,3 @@ const parse = (string) =>
       return [key, value];
     })
   );
-module.exports = { queryString, parse };
