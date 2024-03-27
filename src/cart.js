@@ -1,6 +1,23 @@
 import DineroFactory from 'dinero.js';
 import { find, remove } from 'lodash';
 
+const calculatePercentageDiscount = (amount, item) => {
+  if (item.condition?.percentage && item.quantity > item.condition.minimum) {
+    return amount.percentage(item.condition.percentage);
+  }
+
+  return Money({ amount: 0 });
+};
+
+const calculateQuantityDiscount = (amount, item) => {
+  const isEven = item.quantity % 2 === 0;
+  if (item.condition?.quantity && item.quantity > item.condition.quantity) {
+    return amount.percentage(isEven ? 50 : 40);
+  }
+
+  return Money({ amount: 0 });
+};
+
 const Money = DineroFactory;
 Money.defaultCurrency = 'BRL';
 Money.defaultPrecision = 2;
@@ -21,7 +38,17 @@ export default class Cart {
 
   getTotal() {
     return this.items.reduce((acc, item) => {
-      return acc.add(Money({ amount: item.quantity * item.product.price }));
+      const amount = Money({ amount: item.quantity * item.product.price });
+
+      let discount = Money({ amount: 0 });
+
+      if (item.condition?.percentage) {
+        discount = calculatePercentageDiscount(amount, item);
+      } else if (item.condition?.quantity) {
+        discount = calculateQuantityDiscount(amount, item);
+      }
+
+      return acc.add(amount).subtract(discount);
     }, Money({ amount: 0 }));
   }
 

@@ -99,4 +99,76 @@ describe('Cart', () => {
       expect(cart.getTotal().getAmount()).toEqual(0);
     });
   });
+
+  describe('Special conditions', () => {
+    it('Should apply percentage discount quantity above minimum is passed', () => {
+      const condition = {
+        percentage: 30,
+        minimum: 2,
+      };
+      cart.add({
+        product,
+        condition,
+        quantity: 3,
+      });
+
+      expect(cart.getTotal().getAmount()).toEqual(74315);
+    });
+
+    it('Should NOT apply percentage discount quantity is below or equals minimum', () => {
+      const condition = {
+        percentage: 30,
+        minimum: 2,
+      };
+      cart.add({
+        product,
+        condition,
+        quantity: 2,
+      });
+
+      expect(cart.getTotal().getAmount()).toEqual(70776);
+    });
+
+    it('Should apply quantity discount for even quantities', () => {
+      const condition = {
+        quantity: 2,
+      };
+
+      cart.add({
+        product,
+        condition,
+        quantity: 4,
+      });
+
+      expect(cart.getTotal().getAmount()).toEqual(70776);
+    });
+
+    it('Should NOT apply quantity discount for even quantities when condition is not met', () => {
+      const condition = {
+        quantity: 2,
+      };
+
+      cart.add({
+        product,
+        condition,
+        quantity: 1,
+      });
+
+      expect(cart.getTotal().getAmount()).toEqual(35388);
+    });
+
+    it('Should apply quantity discount for odd quantities', () => {
+      const condition = {
+        quantity: 2,
+      };
+
+      cart.add({
+        product,
+        condition,
+        quantity: 5,
+      });
+
+      expect(cart.getTotal().getAmount()).toEqual(106164);
+    });
+  });
 });
